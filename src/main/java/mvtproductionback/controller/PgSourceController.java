@@ -50,4 +50,19 @@ public class PgSourceController {
         return pgSourceService.getPgShpsInfo(ip,port,pgName);
     }
 
+    //默认数据库源
+    @ApiOperation(value = "默认pg数据库源")
+    @GetMapping(value = "/mvtPG/{ip}/{port}/{pgName}/{tableName}/{zoom}/{x}/{y}.pbf")
+    public void getMvt(
+                        @PathVariable("ip") String ip,
+                        @PathVariable("port") String port,
+                        @PathVariable("pgName") String pgName,
+                        @PathVariable("tableName") String tableName,
+                       @PathVariable("zoom") int zoom,
+                       @PathVariable("x") int x,
+                       @PathVariable("y") int y,
+                       HttpServletResponse response) throws IOException {
+
+        pgSourceService.getMvt(ip,port,pgName,zoom,x,y,tableName,response);
+    }
 }

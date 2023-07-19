@@ -4,12 +4,15 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import mvtproductionback.entity.CreateCacheTaskDTO;
 import mvtproductionback.entity.response.JsonResult;
+import mvtproductionback.kafka.KafkaProducer;
 import mvtproductionback.service.MvtService;
+import mvtproductionback.util.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Random;
 
 /**
  * @Description
@@ -24,6 +27,9 @@ public class MvtController {
 
     @Autowired
     MvtService mvtService;
+
+    @Autowired
+    KafkaProducer kafkaProducer;
 
     @ApiOperation(value = "获取瓦片")
     @GetMapping(value = "/getMvtFromMB/{mbName}/{zoom}/{x}/{y}.pbf")
@@ -43,6 +49,13 @@ public class MvtController {
 
         return mvtService.createTileCache(createCacheTaskDTO);
 
+    }
+
+    @ApiOperation(value = "生产瓦片存储为mbtiles-消息")
+    @PostMapping("/createTileCacheMessage")
+    public JsonResult createTileCacheMessage(@RequestBody CreateCacheTaskDTO createCacheTaskDTO) {
+        kafkaProducer.cacheTaskProducerProd(new Random().nextInt(),"缓存任务",createCacheTaskDTO);
+        return ResponseResult.success();
     }
 
 

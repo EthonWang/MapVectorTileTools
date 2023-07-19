@@ -3,19 +3,23 @@ package mvtproductionback.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import mvtproductionback.dao.MyPgDao;
 import mvtproductionback.entity.AddPgDTO;
 import mvtproductionback.config.PgConnectMap;
 import mvtproductionback.entity.response.JsonResult;
+import mvtproductionback.util.MvtUtils;
 import mvtproductionback.util.ResponseResult;
+import org.apache.tomcat.jni.OS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Description
@@ -28,6 +32,9 @@ public class PgSourceService {
 
     @Autowired
     PgConnectMap pgConnectMap;
+
+    @Autowired
+    MyPgDao myPgDao;
 
     public JsonResult addPgSource(AddPgDTO addPgDTO) {
         try{
@@ -165,5 +172,43 @@ public class PgSourceService {
         }
     }
 
+    public String getMvtSql(int zoom, int x, int y,String tableName){
+        if (!MvtUtils.tileIsValid(zoom, x, y)) {
+            return null;
+        }
+        HashMap<String, Double> envelope = MvtUtils.tileToEnvelope(zoom, x, y);
+        String sql = MvtUtils.envelopeToSQL(envelope, tableName);
+        return sql;
+    }
 
+    public void getMvt(String ip, String port, String pgName, int zoom, int x, int y, String tableName, HttpServletResponse response) throws IOException {
+
+        try {
+            String sql= getMvtSql(zoom,x,y,tableName);
+            if (sql==null){
+                return;
+            }
+
+            byte[] mvtByte=myPgDao.getMvtFromPgSource(ip,port,pgName,sql);
+
+
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            final Collection<String> headers = response.getHeaders("Access-Control-Allow-Origin");
+            if(mvtByte==null){
+                response.sendError(404,"mvt not exist");
+            }else{
+                response.setHeader("Content-type", "application/vnd.mapbox-vector-tile");
+                String mtvFileName = String.format("%d_%d_%d.mvt", zoom, x, y);
+                response.setHeader("Content-Disposition", "attachment;filename=" + new String(mtvFileName.getBytes("UTF-8"), "iso-8859-1"));
+                OutputStream os = response.getOutputStream();
+
+                assert mvtByte != null;
+                os.write(mvtByte);
+
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+
+        }
+    }
 }
