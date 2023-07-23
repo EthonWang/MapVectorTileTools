@@ -13,7 +13,7 @@ import mvtproductionback.entity.CreateCacheTaskDTO;
 @AllArgsConstructor
 public class CacheTaskMessageTest {
 
-    public static final String TOPIC = "CacheTask";
+    public static final String TOPIC = "CacheTaskTopic";
 
     private Integer id;
     private String msg;

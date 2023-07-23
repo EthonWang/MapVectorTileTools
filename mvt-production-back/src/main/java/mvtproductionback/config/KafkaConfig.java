@@ -13,19 +13,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class KafkaConfig {
     // 创建一个名为testtopic的Topic并设置分区数为8，分区副本数为2
-    @Bean
-    public NewTopic initialTopic() {
-        return new NewTopic("CacheTask",3, (short) 1 );
-    }
-
-    @Bean
-    public NewTopic initialTopic2() {
-        return new NewTopic("CacheTest",3, (short) 2 );
-    }
+//    @Bean
+//    public NewTopic initialTopic() {
+//        return new NewTopic("CacheTask",3, (short) 1 );
+//    }
+//
+//    @Bean
+//    public NewTopic initialTopic2() {
+//        return new NewTopic("CacheTest",3, (short) 2 );
+//    }
 
     @Bean
     public NewTopic initialTopic3() {
-        return new NewTopic("CacheTaskProd",3, (short) 2 );
+        return new NewTopic("CacheTaskTopic",2, (short) 2 );
     }
 
 

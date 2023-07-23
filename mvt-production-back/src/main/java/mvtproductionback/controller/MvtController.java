@@ -51,7 +51,7 @@ public class MvtController {
 
     }
 
-    @ApiOperation(value = "生产瓦片存储为mbtiles-消息")
+    @ApiOperation(value = "生产瓦片存储为mbtiles-分布式")
     @PostMapping("/createTileCacheMessage")
     public JsonResult createTileCacheMessage(@RequestBody CreateCacheTaskDTO createCacheTaskDTO) {
         kafkaProducer.cacheTaskProducerProd(new Random().nextInt(),"缓存任务",createCacheTaskDTO);
